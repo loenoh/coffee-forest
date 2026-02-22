@@ -1,11 +1,13 @@
-import { Coffee, Droplets, Leaf, ArrowRight, Loader2 } from 'lucide-react';
+import { Coffee, Droplets, Leaf, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import DebugConsole from '../components/DebugConsole';
 
 export default function LandingPage() {
-    const { user, isLoading, loginWithGoogle } = useAuthStore();
+    const { user, isLoading, loginWithGoogle, loginWithPopup } = useAuthStore();
     const navigate = useNavigate();
+    const [showPopupHelp, setShowPopupHelp] = useState(false);
 
     // If already logged in, go to dashboard
     useEffect(() => {
@@ -14,18 +16,48 @@ export default function LandingPage() {
         }
     }, [user, isLoading, navigate]);
 
+    // Show popup help if loading takes too long
+    useEffect(() => {
+        let timer: any;
+        if (isLoading) {
+            timer = setTimeout(() => setShowPopupHelp(true), 5000);
+        } else {
+            setShowPopupHelp(false);
+        }
+        return () => clearTimeout(timer);
+    }, [isLoading]);
+
     if (isLoading) {
         return (
-            <div className="w-full max-w-[390px] mx-auto bg-[#1a1412] h-screen sm:h-[844px] flex flex-col items-center justify-center text-white">
+            <div className="w-full max-w-[390px] mx-auto bg-[#1a1412] h-screen sm:h-[844px] flex flex-col items-center justify-center text-white px-8">
                 <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
-                <p className="text-espresso-lighest opacity-70">Verifying session...</p>
+                <p className="text-espresso-lighest opacity-70 mb-2">Verifying session...</p>
+                {showPopupHelp && (
+                    <div className="mt-8 p-4 bg-white/5 rounded-2xl border border-white/10 animate-[fadeIn_0.5s_ease-out] w-full">
+                        <p className="text-[11px] text-white/50 text-center mb-4">
+                            If this takes too long, your browser might be blocking the redirect.
+                        </p>
+                        <button
+                            onClick={loginWithPopup}
+                            className="w-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-3 rounded-xl transition-all border border-white/10"
+                        >
+                            Try Popup Login instead
+                        </button>
+                    </div>
+                )}
+                <div className="mt-auto pb-8 w-full flex justify-center">
+                    <DebugConsole />
+                </div>
             </div>
         );
     }
 
     return (
         <div className="relative w-full max-w-[390px] mx-auto bg-gradient-to-b from-[#1a1412] to-[#0a0807] min-h-screen sm:min-h-[844px] sm:h-[844px] sm:rounded-[2.5rem] sm:shadow-float sm:border-[8px] sm:border-white overflow-hidden flex flex-col items-center justify-between text-white px-6 py-12">
-            {/* ... (rest of the component stays the same) */}
+
+            <div className="absolute top-4 right-4 z-20">
+                <DebugConsole />
+            </div>
 
             {/* Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-40">
@@ -72,17 +104,28 @@ export default function LandingPage() {
 
             {/* Call to Action */}
             <div className="z-10 w-full mt-auto mb-6 animate-[slideUp_1s_ease-out_0.4s_both]">
-                <button
-                    onClick={loginWithGoogle}
-                    disabled={isLoading}
-                    className="w-full bg-white hover:bg-gray-100 text-[#1a1412] font-extrabold py-5 rounded-2xl shadow-[0_10px_40px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center justify-center gap-3 group disabled:opacity-50"
-                >
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-                    <span className="text-lg">Continue with Google</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform opacity-50" />
-                </button>
-                <p className="text-center text-[10px] text-white/40 mt-6">
-                    By continuing, you agree to our Terms of Service and Privacy Policy. Syncs across all devices automatically.
+                <div className="flex flex-col gap-3">
+                    <button
+                        onClick={loginWithGoogle}
+                        disabled={isLoading}
+                        className="w-full bg-white hover:bg-gray-100 text-[#1a1412] font-extrabold py-5 rounded-2xl shadow-[0_10px_40px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center justify-center gap-3 group disabled:opacity-50"
+                    >
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                        <span className="text-lg">Continue with Google</span>
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform opacity-50" />
+                    </button>
+
+                    <button
+                        onClick={loginWithPopup}
+                        className="w-full bg-white/5 hover:bg-white/10 text-white/50 text-xs py-2 rounded-xl transition-all border border-white/5"
+                    >
+                        Trouble logging in? Try Popup
+                    </button>
+                </div>
+
+                <p className="text-center text-[10px] text-white/40 mt-6 flex items-center justify-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    Recommended: Open in Safari or Chrome
                 </p>
             </div>
 
@@ -99,4 +142,3 @@ export default function LandingPage() {
         </div>
     );
 }
-
