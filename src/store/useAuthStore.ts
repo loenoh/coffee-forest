@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { User } from 'firebase/auth';
-import { signInWithRedirect, signOut, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
+import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 
 interface AuthState {
@@ -16,19 +16,17 @@ export const useAuthStore = create<AuthState>((set) => {
         set({ user, isLoading: false });
     });
 
-    // Handle redirect result on store initialization
-    getRedirectResult(auth).catch((error) => {
-        console.error("Redirect login result error:", error);
-    });
-
     return {
         user: auth.currentUser,
         isLoading: true, // Initial loading state
         loginWithGoogle: async () => {
+            set({ isLoading: true });
             try {
-                await signInWithRedirect(auth, googleProvider);
+                // Now that loenoh.github.io is whitelisted, Popup should work smoothly
+                await signInWithPopup(auth, googleProvider);
             } catch (error) {
-                console.error("Login redirect failed:", error);
+                console.error("Login failed:", error);
+                set({ isLoading: false });
             }
         },
         logout: async () => {
