@@ -3,17 +3,30 @@ import { useAuthStore } from '../store/useAuthStore';
 import { Coffee, Droplets, TreePine, BookOpen, Settings, LogOut } from 'lucide-react';
 
 export default function MainDashboard() {
-    const { caffeineMg, hydrationL, treeGrowthPercent, addCoffee } = useForestStore();
+    const { caffeineMg, hydrationL, treeGrowthPercent, addCoffee, waterPlant } = useForestStore();
     const { user, logout } = useAuthStore();
     const handlePourCoffee = () => {
-        // Adding a standard 80mg espresso shot
         addCoffee(80);
-
-        // Optional: Add haptic feedback if supported by browser
-        if (navigator.vibrate) {
-            navigator.vibrate(50);
-        }
+        if (navigator.vibrate) navigator.vibrate(50);
     };
+
+    const handleDrinkWater = () => {
+        waterPlant(0.25); // Add 250ml of water
+        if (navigator.vibrate) navigator.vibrate(50);
+    };
+
+    // Calculate Evolution Stage and Debuff (Sick)
+    const isSick = caffeineMg >= 400 && hydrationL < 1.5;
+
+    const getTreeVisual = () => {
+        if (treeGrowthPercent >= 100) return { emoji: '🌲', label: 'Coffee Tree (Max)' };
+        if (treeGrowthPercent >= 70) return { emoji: '🌳', label: 'Mature Tree' };
+        if (treeGrowthPercent >= 40) return { emoji: '🪴', label: 'Small Plant' };
+        if (treeGrowthPercent >= 20) return { emoji: '🌿', label: 'Seedling' };
+        return { emoji: '🌱', label: 'Sprout' };
+    };
+
+    const treeVisual = getTreeVisual();
 
     return (
         <div className="relative w-full max-w-[390px] mx-auto bg-background-light min-h-screen sm:min-h-[844px] sm:h-[844px] sm:rounded-[2.5rem] sm:shadow-float sm:border-[8px] sm:border-white overflow-hidden flex flex-col">
@@ -38,21 +51,31 @@ export default function MainDashboard() {
             {/* Interactive Area */}
             <div className="flex-1 px-6 flex flex-col items-center justify-center relative">
                 {/* Plant */}
-                <div className="relative z-10 mb-8 w-full flex justify-center">
-                    <div className="w-48 h-48 bg-gradient-to-t from-primary/20 to-transparent rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 blur-2xl"></div>
-                    {/* Using a placeholder coffee plant image */}
-                    <img
-                        alt="Growing Plant"
-                        className="w-48 h-auto drop-shadow-2xl relative z-10 animate-[bounce_3s_infinite]"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBqbAVfFea6I13YigTTGszruhohBxTkF9jxpq-fv5HeoVXduQo8lcr1E69Kn1ZILtYSDQj89V6G2O1sjy9D2aOYmgHxUz8yUeV_dPv2NUdFqyrYVSC5TYH5LYX4EOR7JZXP7txVkyN1nr4ZwY5hsgY1D1Q35EvGAeb-dbqhi6BhYkAQXVWnbbqMW1Xut6JozqRYkHYklsaPCXvQxF_3E4uglHUjnkX25MwuV-vec3hW33hP0QC6CRSDRrYfRYjaU9bMQbvG7wIVBcb"
+                <div className="relative z-10 mb-8 w-full flex flex-col items-center justify-center">
+                    <div className="w-48 h-48 bg-gradient-to-t from-primary/20 to-transparent rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 blur-2xl z-0"></div>
+
+                    {/* Tree Visual */}
+                    <div
+                        className={`text-9xl relative z-10 select-none transition-all duration-700
+                            ${isSick ? 'grayscale contrast-50 sepia-[.30] opacity-80 animate-none' : 'drop-shadow-2xl animate-[bounce_3s_infinite]'}
+                        `}
                         style={{ animationTimingFunction: 'cubic-bezier(0.280, 0.840, 0.420, 1)' }}
-                    />
+                    >
+                        {treeVisual.emoji}
+                    </div>
+
+                    {/* Sick Warning */}
+                    {isSick && (
+                        <div className="mt-4 bg-red-500/10 text-red-600 px-4 py-2 rounded-full text-xs font-bold border border-red-500/20 backdrop-blur-md animate-pulse z-20">
+                            💧 Your tree is dehydrated! Drink water!
+                        </div>
+                    )}
                 </div>
 
                 {/* Growth Bar */}
                 <div className="w-full mb-8">
                     <div className="flex justify-between text-xs font-bold text-espresso/60 mb-2 uppercase tracking-wide">
-                        <span>Sprout Stage</span>
+                        <span>{treeVisual.label}</span>
                         <span className="text-primary">{treeGrowthPercent}%</span>
                     </div>
                     <div className="w-full bg-white h-4 rounded-full p-1 shadow-inner">
@@ -79,14 +102,23 @@ export default function MainDashboard() {
                     </div>
                 </div>
 
-                {/* Primary Action Button (Pour Coffee) */}
-                <button
-                    onClick={handlePourCoffee}
-                    className="w-full bg-espresso hover:bg-[#3A2A1A] text-white font-bold py-4 rounded-2xl shadow-lg shadow-espresso/20 active:scale-95 transition-all flex items-center justify-center gap-2 group"
-                >
-                    <Coffee className="w-5 h-5 group-active:translate-y-1 transition-transform" />
-                    <span>Record Coffee</span>
-                </button>
+                {/* Action Buttons */}
+                <div className="flex gap-3 w-full">
+                    <button
+                        onClick={handleDrinkWater}
+                        className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all flex flex-col items-center justify-center gap-1 group"
+                    >
+                        <Droplets className="w-5 h-5 group-active:translate-y-1 transition-transform" />
+                        <span className="text-sm">+250ml</span>
+                    </button>
+                    <button
+                        onClick={handlePourCoffee}
+                        className="flex-[2] bg-espresso hover:bg-[#3A2A1A] text-white font-bold py-4 rounded-2xl shadow-lg shadow-espresso/20 active:scale-95 transition-all flex items-center justify-center gap-2 group"
+                    >
+                        <Coffee className="w-5 h-5 group-active:translate-y-1 transition-transform" />
+                        <span>Record Coffee</span>
+                    </button>
+                </div>
             </div>
 
             {/* Bottom Nav */}
