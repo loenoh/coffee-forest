@@ -1,17 +1,38 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainDashboard from './components/MainDashboard';
 import RewardPopup from './components/RewardPopup';
+import LandingPage from './pages/LandingPage';
 import { useForestStore } from './store/useForestStore';
 import { useFirestoreSync } from './hooks/useFirestoreSync';
+import { useAuthStore } from './store/useAuthStore';
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuthStore();
+  if (!user) return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
 
 function App() {
   const { showRewardPopup } = useForestStore();
   useFirestoreSync();
 
   return (
-    <div className="bg-slate-200 min-h-screen flex items-center justify-center sm:p-4">
-      <MainDashboard />
-      {showRewardPopup && <RewardPopup />}
-    </div>
+    <Router>
+      <div className="bg-slate-200 min-h-screen flex items-center justify-center sm:p-4 font-sans">
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <MainDashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+        {showRewardPopup && <RewardPopup />}
+      </div>
+    </Router>
   );
 }
 
