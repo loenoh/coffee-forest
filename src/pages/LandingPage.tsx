@@ -2,7 +2,7 @@ import { Coffee, Droplets, Leaf, ArrowRight, Loader2, AlertCircle } from 'lucide
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import DebugConsole from '../components/DebugConsole';
+
 
 export default function LandingPage() {
     const { user, isLoading, loginWithGoogle, loginWithRedirect } = useAuthStore();
@@ -42,9 +42,7 @@ export default function LandingPage() {
                         </button>
                     </div>
                 )}
-                <div className="mt-auto pb-8 w-full flex justify-center">
-                    <DebugConsole />
-                </div>
+
             </div>
         );
     }
@@ -52,9 +50,7 @@ export default function LandingPage() {
     return (
         <div className="relative w-full max-w-[390px] mx-auto bg-gradient-to-b from-[#1a1412] to-[#0a0807] min-h-screen sm:min-h-[844px] sm:h-[844px] sm:rounded-[2.5rem] sm:shadow-float sm:border-[8px] sm:border-white overflow-hidden flex flex-col items-center justify-between text-white px-6 py-12">
 
-            <div className="absolute top-4 right-4 z-20">
-                <DebugConsole />
-            </div>
+
 
             {/* Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-40">
