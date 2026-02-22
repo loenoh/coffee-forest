@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #11d442;
+  /* Canopy Green */
+  --color-background-light: #F9F7F2;
+  /* Morning Oatmeal */
+  --color-background-dark: #102215;
+  /* Deep Forest */
+  --color-espresso: #4B3621;
+  /* Text/Accents */
+  --color-crema: #D4AF37;
+  /* Rewards/Gold */
+  --color-foam: #E8E2D2;
+  /* Secondary backgrounds */
+
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-sans: 'Inter', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  --animate-spin-slow: spin 12s linear infinite;
+  --animate-float: float 3s ease-in-out infinite;
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background-light text-espresso font-display selection:bg-primary selection:text-white;
+    background-image: radial-gradient(#4B3621 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+  }
+}
+
+@layer utilities {
+  .holographic-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .god-rays {
+    background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(244, 140, 37, 0.2) 20deg, transparent 40deg, rgba(244, 140, 37, 0.1) 60deg, transparent 80deg, rgba(244, 140, 37, 0.2) 100deg, transparent 120deg, rgba(244, 140, 37, 0.1) 140deg, transparent 160deg, rgba(244, 140, 37, 0.2) 180deg, transparent 200deg, rgba(244, 140, 37, 0.1) 220deg, transparent 240deg, rgba(244, 140, 37, 0.2) 260deg, transparent 280deg, rgba(244, 140, 37, 0.1) 300deg, transparent 320deg, rgba(244, 140, 37, 0.2) 340deg, transparent 360deg);
+    mask-image: radial-gradient(circle, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 70%);
+  }
+}
