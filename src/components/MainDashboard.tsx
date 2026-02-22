@@ -1,9 +1,9 @@
 import { useForestStore } from '../store/useForestStore';
 import { useAuthStore } from '../store/useAuthStore';
-import { Coffee, Droplets, TreePine, BookOpen, Settings, LogOut, ShoppingCart } from 'lucide-react';
+import { Coffee, Droplets, TreePine, BookOpen, LogOut, ShoppingCart, Target } from 'lucide-react';
 
 export default function MainDashboard() {
-    const { caffeineMg, hydrationL, treeGrowthPercent, addCoffee, waterPlant, togglePremiumShop, toggleCollectionBook } = useForestStore();
+    const { caffeineMg, hydrationL, treeGrowthPercent, addCoffee, waterPlant, togglePremiumShop, toggleCollectionBook, toggleQuests } = useForestStore();
     const { user, logout } = useAuthStore();
     const handlePourCoffee = () => {
         addCoffee(80);
@@ -141,9 +141,12 @@ export default function MainDashboard() {
                     <ShoppingCart className="w-6 h-6" />
                     <span className="text-[10px] font-bold">Shop</span>
                 </button>
-                <button className="p-2 text-espresso/40 flex flex-col items-center gap-1 hover:text-espresso transition-colors">
-                    <Settings className="w-6 h-6" />
-                    <span className="text-[10px] font-bold">Settings</span>
+                <button
+                    onClick={() => toggleQuests(true)}
+                    className="p-2 text-espresso/40 flex flex-col items-center gap-1 hover:text-espresso transition-colors"
+                >
+                    <Target className="w-6 h-6" />
+                    <span className="text-[10px] font-bold">Quests</span>
                 </button>
             </div>
         </div>
