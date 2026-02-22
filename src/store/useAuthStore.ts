@@ -11,30 +11,41 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => {
-    // Listen for auth state changes globally
+    let isRedirectResolved = false;
+    let isAuthStateResolved = false;
+
+    const finalizeLoading = () => {
+        if (isRedirectResolved && isAuthStateResolved) {
+            set({ isLoading: false });
+        }
+    };
+
+    // 1. Listen for auth state changes globally
     onAuthStateChanged(auth, (user) => {
-        set({ user, isLoading: false });
+        isAuthStateResolved = true;
+        set({ user });
+        finalizeLoading();
     });
 
-    // Capture the redirect result when the app loads back
+    // 2. Explicitly wait for redirect result on initialization
     getRedirectResult(auth)
         .then((result) => {
-            console.log("Redirect result received:", result?.user?.email);
             if (result?.user) {
-                set({ user: result.user, isLoading: false });
-            } else {
-                // If no result but initialization finished, ensure loading is off
-                set({ isLoading: false });
+                console.log("Login Success via Redirect:", result.user.email);
+                set({ user: result.user });
             }
         })
         .catch((error) => {
-            console.error("Redirect login result error:", error);
-            set({ isLoading: false });
+            console.error("Redirect Result Error:", error.code, error.message);
+        })
+        .finally(() => {
+            isRedirectResolved = true;
+            finalizeLoading();
         });
 
     return {
         user: auth.currentUser,
-        isLoading: true, // Initial loading state
+        isLoading: true, // App starts in loading state
         loginWithGoogle: async () => {
             set({ isLoading: true });
             try {
