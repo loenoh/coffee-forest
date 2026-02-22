@@ -1,21 +1,31 @@
-import { Coffee, Droplets, Leaf, ArrowRight } from 'lucide-react';
+import { Coffee, Droplets, Leaf, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
 export default function LandingPage() {
-    const { user, loginWithGoogle } = useAuthStore();
+    const { user, isLoading, loginWithGoogle } = useAuthStore();
     const navigate = useNavigate();
 
     // If already logged in, go to dashboard
     useEffect(() => {
-        if (user) {
+        if (!isLoading && user) {
             navigate('/dashboard');
         }
-    }, [user, navigate]);
+    }, [user, isLoading, navigate]);
+
+    if (isLoading) {
+        return (
+            <div className="w-full max-w-[390px] mx-auto bg-[#1a1412] h-screen sm:h-[844px] flex flex-col items-center justify-center text-white">
+                <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
+                <p className="text-espresso-lighest opacity-70">Verifying session...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="relative w-full max-w-[390px] mx-auto bg-gradient-to-b from-[#1a1412] to-[#0a0807] min-h-screen sm:min-h-[844px] sm:h-[844px] sm:rounded-[2.5rem] sm:shadow-float sm:border-[8px] sm:border-white overflow-hidden flex flex-col items-center justify-between text-white px-6 py-12">
+            {/* ... (rest of the component stays the same) */}
 
             {/* Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-40">
@@ -64,7 +74,8 @@ export default function LandingPage() {
             <div className="z-10 w-full mt-auto mb-6 animate-[slideUp_1s_ease-out_0.4s_both]">
                 <button
                     onClick={loginWithGoogle}
-                    className="w-full bg-white hover:bg-gray-100 text-[#1a1412] font-extrabold py-5 rounded-2xl shadow-[0_10px_40px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center justify-center gap-3 group"
+                    disabled={isLoading}
+                    className="w-full bg-white hover:bg-gray-100 text-[#1a1412] font-extrabold py-5 rounded-2xl shadow-[0_10px_40px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center justify-center gap-3 group disabled:opacity-50"
                 >
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
                     <span className="text-lg">Continue with Google</span>
@@ -88,3 +99,4 @@ export default function LandingPage() {
         </div>
     );
 }
+
