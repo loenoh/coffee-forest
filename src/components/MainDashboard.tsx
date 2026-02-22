@@ -1,9 +1,10 @@
 import { useForestStore } from '../store/useForestStore';
-import { Coffee, Droplets, TreePine, BookOpen, Settings } from 'lucide-react';
+import { useAuthStore } from '../store/useAuthStore';
+import { Coffee, Droplets, TreePine, BookOpen, Settings, LogIn, LogOut } from 'lucide-react';
 
 export default function MainDashboard() {
     const { caffeineMg, hydrationL, treeGrowthPercent, addCoffee } = useForestStore();
-
+    const { user, loginWithGoogle, logout } = useAuthStore();
     const handlePourCoffee = () => {
         // Adding a standard 80mg espresso shot
         addCoffee(80);
@@ -22,9 +23,20 @@ export default function MainDashboard() {
                     <p className="text-sm text-espresso/60">Welcome back,</p>
                     <h3 className="text-xl font-bold text-espresso">My Coffee Forest</h3>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-espresso text-crema flex items-center justify-center shadow-lg">
-                    <span className="material-symbols-outlined text-xl">person</span>
-                </div>
+                {user ? (
+                    <button title="Click to Logout" onClick={logout} className="w-10 h-10 rounded-full bg-espresso flex items-center justify-center shadow-lg hover:ring-2 hover:ring-red-400 transition-all cursor-pointer">
+                        {user.photoURL ? (
+                            <img src={user.photoURL} alt="Profile" className="w-full h-full rounded-full object-cover" />
+                        ) : (
+                            <LogOut className="w-5 h-5 text-white" />
+                        )}
+                    </button>
+                ) : (
+                    <button onClick={loginWithGoogle} className="h-10 px-4 rounded-full bg-primary text-white font-bold flex items-center justify-center shadow-lg hover:bg-[#0fa433] transition-colors gap-2 cursor-pointer">
+                        <LogIn className="w-4 h-4" />
+                        Login
+                    </button>
+                )}
             </div>
 
             {/* Interactive Area */}
