@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface Card {
     id: string;
@@ -38,7 +39,7 @@ export const useForestStore = create<ForestState>()(
             collectedCards: [],
             currentRewardCard: null,
 
-            addCoffee: (mg: number) => set((state) => {
+            addCoffee: (mg: number) => set((state: ForestState) => {
                 // Add coffee triggers a potential reward
                 const newGrowth = Math.min(100, state.treeGrowthPercent + 5);
 
@@ -66,7 +67,7 @@ export const useForestStore = create<ForestState>()(
                 };
             }),
 
-            waterPlant: (liters: number) => set((state) => ({
+            waterPlant: (liters: number) => set((state: ForestState) => ({
                 hydrationL: +(state.hydrationL + liters).toFixed(1),
                 treeGrowthPercent: Math.min(100, state.treeGrowthPercent + 2)
             })),
