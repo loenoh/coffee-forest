@@ -3,6 +3,7 @@ import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import MainDashboard from './components/MainDashboard';
 import RewardPopup from './components/RewardPopup';
 import PremiumShop from './components/PremiumShop';
+import CollectionBook from './components/CollectionBook';
 import LandingPage from './pages/LandingPage';
 import { useForestStore } from './store/useForestStore';
 import { useFirestoreSync } from './hooks/useFirestoreSync';
@@ -15,7 +16,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
-  const { showRewardPopup, showPremiumShop } = useForestStore();
+  const { showRewardPopup, showPremiumShop, showCollectionBook } = useForestStore();
   useFirestoreSync();
 
   const paypalOptions = {
@@ -40,6 +41,7 @@ function App() {
           </Routes>
           {showRewardPopup && <RewardPopup />}
           {showPremiumShop && <PremiumShop />}
+          {showCollectionBook && <CollectionBook />}
         </div>
       </Router>
     </PayPalScriptProvider>

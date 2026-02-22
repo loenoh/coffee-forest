@@ -3,7 +3,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { Coffee, Droplets, TreePine, BookOpen, Settings, LogOut, ShoppingCart } from 'lucide-react';
 
 export default function MainDashboard() {
-    const { caffeineMg, hydrationL, treeGrowthPercent, addCoffee, waterPlant, togglePremiumShop } = useForestStore();
+    const { caffeineMg, hydrationL, treeGrowthPercent, addCoffee, waterPlant, togglePremiumShop, toggleCollectionBook } = useForestStore();
     const { user, logout } = useAuthStore();
     const handlePourCoffee = () => {
         addCoffee(80);
@@ -127,7 +127,10 @@ export default function MainDashboard() {
                     <TreePine className="w-6 h-6" />
                     <span className="text-[10px] font-bold">Forest</span>
                 </button>
-                <button className="p-2 text-espresso/40 flex flex-col items-center gap-1 hover:text-espresso transition-colors">
+                <button
+                    onClick={() => toggleCollectionBook(true)}
+                    className="p-2 text-espresso/40 flex flex-col items-center gap-1 hover:text-espresso transition-colors"
+                >
                     <BookOpen className="w-6 h-6" />
                     <span className="text-[10px] font-bold">Cards</span>
                 </button>
