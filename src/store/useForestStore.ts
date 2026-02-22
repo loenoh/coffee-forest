@@ -26,7 +26,7 @@ interface ForestState {
     closeRewardPopup: () => void;
 }
 
-export const useForestStore = create<ForestState>((set, get) => ({
+export const useForestStore = create<ForestState>((set) => ({
     caffeineMg: 240,
     hydrationL: 1.2,
     streak: 5,
