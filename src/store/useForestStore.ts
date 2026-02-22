@@ -18,6 +18,7 @@ interface ForestState {
 
     // UI State
     showRewardPopup: boolean;
+    showPremiumShop: boolean;
     collectedCards: Card[];
     currentRewardCard: Card | null;
 
@@ -25,6 +26,7 @@ interface ForestState {
     addCoffee: (mg: number) => void;
     waterPlant: (liters: number) => void;
     closeRewardPopup: () => void;
+    togglePremiumShop: (isOpen: boolean) => void;
 }
 
 export const useForestStore = create<ForestState>()(
@@ -36,6 +38,7 @@ export const useForestStore = create<ForestState>()(
             treeGrowthPercent: 75,
 
             showRewardPopup: false,
+            showPremiumShop: false,
             collectedCards: [],
             currentRewardCard: null,
 
@@ -72,7 +75,8 @@ export const useForestStore = create<ForestState>()(
                 treeGrowthPercent: Math.min(100, state.treeGrowthPercent + 2)
             })),
 
-            closeRewardPopup: () => set({ showRewardPopup: false, currentRewardCard: null })
+            closeRewardPopup: () => set({ showRewardPopup: false, currentRewardCard: null }),
+            togglePremiumShop: (isOpen: boolean) => set({ showPremiumShop: isOpen })
         }),
         {
             name: 'coffee-forest-storage', // localStorage에 저장될 키 이름
