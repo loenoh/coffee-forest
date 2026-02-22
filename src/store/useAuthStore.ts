@@ -19,8 +19,12 @@ export const useAuthStore = create<AuthState>((set) => {
     // Capture the redirect result when the app loads back
     getRedirectResult(auth)
         .then((result) => {
+            console.log("Redirect result received:", result?.user?.email);
             if (result?.user) {
                 set({ user: result.user, isLoading: false });
+            } else {
+                // If no result but initialization finished, ensure loading is off
+                set({ isLoading: false });
             }
         })
         .catch((error) => {
