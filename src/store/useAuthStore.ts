@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import type { User } from 'firebase/auth';
-import { signInWithRedirect, signOut, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
+import { signInWithRedirect, signInWithPopup, signOut, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 
 interface AuthState {
     user: User | null;
     isLoading: boolean;
     loginWithGoogle: () => Promise<void>;
+    loginWithPopup: () => Promise<void>;
     logout: () => Promise<void>;
 }
 
@@ -14,8 +15,11 @@ export const useAuthStore = create<AuthState>((set) => {
     let isRedirectResolved = false;
     let isAuthStateResolved = false;
 
+    console.log("AuthStore: Initializing...");
+
     const finalizeLoading = () => {
         if (isRedirectResolved && isAuthStateResolved) {
+            console.log("AuthStore: Both checks resolved. Final Loading State: false");
             set({ isLoading: false });
         }
     };
@@ -23,6 +27,7 @@ export const useAuthStore = create<AuthState>((set) => {
     // 1. Listen for auth state changes globally
     onAuthStateChanged(auth, (user) => {
         isAuthStateResolved = true;
+        console.log("AuthStore: onAuthStateChanged - User:", user?.email || "null");
         set({ user });
         finalizeLoading();
     });
@@ -30,13 +35,13 @@ export const useAuthStore = create<AuthState>((set) => {
     // 2. Explicitly wait for redirect result on initialization
     getRedirectResult(auth)
         .then((result) => {
+            console.log("AuthStore: getRedirectResult finished. Result User:", result?.user?.email || "null");
             if (result?.user) {
-                console.log("Login Success via Redirect:", result.user.email);
                 set({ user: result.user });
             }
         })
         .catch((error) => {
-            console.error("Redirect Result Error:", error.code, error.message);
+            console.error("AuthStore: Redirect Error:", error.code, error.message);
         })
         .finally(() => {
             isRedirectResolved = true;
@@ -45,15 +50,26 @@ export const useAuthStore = create<AuthState>((set) => {
 
     return {
         user: auth.currentUser,
-        isLoading: true, // App starts in loading state
+        isLoading: true,
         loginWithGoogle: async () => {
+            console.log("AuthStore: Triggering loginWithGoogle (Redirect)...");
             set({ isLoading: true });
             try {
-                // signInWithRedirect is essential for mobile stability 
-                // and avoiding many popup blocker/webview issues.
                 await signInWithRedirect(auth, googleProvider);
-            } catch (error) {
-                console.error("Login redirect failed:", error);
+            } catch (error: any) {
+                console.error("AuthStore: loginWithGoogle failed:", error.code, error.message);
+                set({ isLoading: false });
+            }
+        },
+        loginWithPopup: async () => {
+            console.log("AuthStore: Triggering loginWithPopup...");
+            // No loading state change here to avoid browser blocking the popup
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                console.log("AuthStore: Popup Login Success:", result.user.email);
+                set({ user: result.user, isLoading: false });
+            } catch (error: any) {
+                console.error("AuthStore: loginWithPopup failed:", error.code, error.message);
                 set({ isLoading: false });
             }
         },
@@ -61,7 +77,7 @@ export const useAuthStore = create<AuthState>((set) => {
             try {
                 await signOut(auth);
             } catch (error) {
-                console.error("Logout failed:", error);
+                console.error("AuthStore: Logout failed:", error);
             }
         }
     };
