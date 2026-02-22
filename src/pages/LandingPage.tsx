@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 import DebugConsole from '../components/DebugConsole';
 
 export default function LandingPage() {
-    const { user, isLoading, loginWithGoogle, loginWithPopup } = useAuthStore();
+    const { user, isLoading, loginWithGoogle, loginWithRedirect } = useAuthStore();
     const navigate = useNavigate();
-    const [showPopupHelp, setShowPopupHelp] = useState(false);
+    const [showRefreshHint, setShowRefreshHint] = useState(false);
 
     // If already logged in, go to dashboard
     useEffect(() => {
@@ -16,14 +16,11 @@ export default function LandingPage() {
         }
     }, [user, isLoading, navigate]);
 
-    // Show popup help if loading takes too long
+    // Show refresh hint if loading takes too long
     useEffect(() => {
-        let timer: any;
-        if (isLoading) {
-            timer = setTimeout(() => setShowPopupHelp(true), 5000);
-        } else {
-            setShowPopupHelp(false);
-        }
+        let timer = setTimeout(() => {
+            if (isLoading) setShowRefreshHint(true);
+        }, 5000);
         return () => clearTimeout(timer);
     }, [isLoading]);
 
@@ -31,17 +28,17 @@ export default function LandingPage() {
         return (
             <div className="w-full max-w-[390px] mx-auto bg-[#1a1412] h-screen sm:h-[844px] flex flex-col items-center justify-center text-white px-8">
                 <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
-                <p className="text-espresso-lighest opacity-70 mb-2">Verifying session...</p>
-                {showPopupHelp && (
-                    <div className="mt-8 p-4 bg-white/5 rounded-2xl border border-white/10 animate-[fadeIn_0.5s_ease-out] w-full">
-                        <p className="text-[11px] text-white/50 text-center mb-4">
-                            If this takes too long, your browser might be blocking the redirect.
+                <p className="text-espresso-lighest opacity-70 mb-2">Connecting to forest...</p>
+                {showRefreshHint && (
+                    <div className="mt-8 p-4 bg-white/5 rounded-2xl border border-white/10 animate-[fadeIn_0.5s_ease-out] w-full text-center">
+                        <p className="text-[11px] text-white/50 mb-3 text-pretty">
+                            It's taking longer than usual. Please check your network or try refreshing.
                         </p>
                         <button
-                            onClick={loginWithPopup}
-                            className="w-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-3 rounded-xl transition-all border border-white/10"
+                            onClick={() => window.location.reload()}
+                            className="text-primary text-xs font-bold underline"
                         >
-                            Try Popup Login instead
+                            Refresh App
                         </button>
                     </div>
                 )}
@@ -116,16 +113,16 @@ export default function LandingPage() {
                     </button>
 
                     <button
-                        onClick={loginWithPopup}
-                        className="w-full bg-white/5 hover:bg-white/10 text-white/50 text-xs py-2 rounded-xl transition-all border border-white/5"
+                        onClick={loginWithRedirect}
+                        className="w-full bg-white/5 hover:bg-white/10 text-white/50 text-[10px] py-2 rounded-xl transition-all border border-white/5"
                     >
-                        Trouble logging in? Try Popup
+                        Login Problems? Use Redirect Mode
                     </button>
                 </div>
 
                 <p className="text-center text-[10px] text-white/40 mt-6 flex items-center justify-center gap-1">
                     <AlertCircle className="w-3 h-3" />
-                    Recommended: Open in Safari or Chrome
+                    Please use Safari/Chrome on mobile.
                 </p>
             </div>
 
